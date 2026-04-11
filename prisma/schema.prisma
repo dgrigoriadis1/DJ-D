@@ -1,0 +1,61 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id        String    @id @default(cuid())
+  spotifyId String    @unique
+  email     String?
+  name      String?
+  image     String?
+  setlists  Setlist[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("users")
+}
+
+model Setlist {
+  id          String         @id @default(cuid())
+  userId      String
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  tracks      SetlistTrack[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@map("setlists")
+}
+
+model SetlistTrack {
+  id           String   @id @default(cuid())
+  setlistId    String
+  setlist      Setlist  @relation(fields: [setlistId], references: [id], onDelete: Cascade)
+  spotifyId    String
+  name         String
+  artist       String
+  album        String
+  albumArt     String?
+  duration     Int      // milliseconds
+  bpm          Float
+  key          Int      // Spotify key 0-11, -1 = unknown
+  mode         Int      // 0 = minor, 1 = major
+  energy       Float    // 0.0 - 1.0
+  danceability Float    // 0.0 - 1.0
+  valence      Float    // 0.0 - 1.0 (musical positiveness)
+  loudness     Float    // dB, typically -60 to 0
+  position     Int      // order within setlist (0-indexed)
+  createdAt    DateTime @default(now())
+
+  @@map("setlist_tracks")
+}

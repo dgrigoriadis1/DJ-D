@@ -2,63 +2,206 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    --background: 222 47% 5%;
-    --foreground: 210 40% 98%;
+/* ============================================================
+   NEON MODE (default) — electric violet / cyan / pink
+   ============================================================ */
+:root {
+  /* Base */
+  --background: 258 60% 4%;          /* #08040F — deep purple-black */
+  --foreground: 260 10% 96%;         /* near white */
 
-    --card: 222 47% 8%;
-    --card-foreground: 210 40% 98%;
+  /* Cards & surfaces */
+  --card: 258 50% 7%;                /* #110820 — dark purple */
+  --card-foreground: 260 10% 96%;
 
-    --popover: 222 47% 8%;
-    --popover-foreground: 210 40% 98%;
+  --popover: 258 50% 7%;
+  --popover-foreground: 260 10% 96%;
 
-    --primary: 142 70% 45%;
-    --primary-foreground: 0 0% 0%;
+  /* Brand / primary — electric violet */
+  --primary: 270 85% 65%;            /* #A855F7 */
+  --primary-foreground: 0 0% 100%;
 
-    --secondary: 217 32% 17%;
-    --secondary-foreground: 210 40% 98%;
+  /* Secondary surface */
+  --secondary: 258 40% 12%;
+  --secondary-foreground: 260 10% 90%;
 
-    --muted: 217 32% 17%;
-    --muted-foreground: 215 20% 55%;
+  /* Muted */
+  --muted: 258 35% 10%;
+  --muted-foreground: 260 15% 55%;
 
-    --accent: 217 32% 17%;
-    --accent-foreground: 210 40% 98%;
+  /* Accent — cyan */
+  --accent: 190 95% 40%;             /* #06B6D4 */
+  --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 62% 50%;
-    --destructive-foreground: 210 40% 98%;
+  /* Destructive */
+  --destructive: 350 80% 55%;
+  --destructive-foreground: 0 0% 100%;
 
-    --border: 217 32% 17%;
-    --input: 217 32% 17%;
-    --ring: 142 70% 45%;
+  /* Borders & inputs */
+  --border: 270 40% 18%;
+  --input: 258 40% 12%;
+  --ring: 270 85% 65%;
 
-    --radius: 0.5rem;
-  }
+  --radius: 0.625rem;
+
+  /* Custom brand values (used in inline styles & utilities) */
+  --violet: #A855F7;
+  --violet-dim: rgba(168, 85, 247, 0.15);
+  --violet-border: rgba(168, 85, 247, 0.25);
+  --cyan: #22D3EE;
+  --cyan-dim: rgba(34, 211, 238, 0.12);
+  --pink: #F472B6;
+  --pink-dim: rgba(244, 114, 182, 0.12);
+
+  /* Glow intensities */
+  --glow-violet: 0 0 24px rgba(168, 85, 247, 0.45), 0 0 60px rgba(168, 85, 247, 0.15);
+  --glow-cyan: 0 0 20px rgba(34, 211, 238, 0.35), 0 0 50px rgba(34, 211, 238, 0.1);
+  --glow-sm: 0 0 12px rgba(168, 85, 247, 0.3);
 }
 
+/* ============================================================
+   UNDERGROUND MODE — deep black / muted purples
+   ============================================================ */
+[data-theme="underground"] {
+  --background: 240 20% 3%;          /* #050508 — near black */
+  --foreground: 240 8% 88%;          /* slightly muted white */
+
+  --card: 240 15% 6%;                /* #0C0C14 */
+  --card-foreground: 240 8% 88%;
+
+  --popover: 240 15% 6%;
+  --popover-foreground: 240 8% 88%;
+
+  --primary: 270 65% 48%;            /* #7C3AED — deeper violet */
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 240 15% 10%;
+  --secondary-foreground: 240 8% 75%;
+
+  --muted: 240 15% 8%;
+  --muted-foreground: 240 10% 42%;
+
+  --accent: 190 65% 32%;             /* #0891B2 — dim cyan */
+  --accent-foreground: 0 0% 100%;
+
+  --destructive: 350 60% 42%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 260 25% 12%;
+  --input: 240 15% 10%;
+  --ring: 270 65% 48%;
+
+  --violet: #7C3AED;
+  --violet-dim: rgba(124, 58, 237, 0.12);
+  --violet-border: rgba(124, 58, 237, 0.2);
+  --cyan: #0891B2;
+  --cyan-dim: rgba(8, 145, 178, 0.1);
+  --pink: #BE185D;
+  --pink-dim: rgba(190, 24, 93, 0.1);
+
+  --glow-violet: 0 0 16px rgba(124, 58, 237, 0.3), 0 0 40px rgba(124, 58, 237, 0.08);
+  --glow-cyan: 0 0 14px rgba(8, 145, 178, 0.25);
+  --glow-sm: 0 0 8px rgba(124, 58, 237, 0.2);
+}
+
+/* ============================================================
+   BASE STYLES
+   ============================================================ */
 @layer base {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
   }
 
-  /* Custom scrollbar */
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+  /* Noise texture overlay — subtle grain on the background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
   }
-  ::-webkit-scrollbar-track {
-    background: hsl(var(--background));
+
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--violet-border); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--violet); }
+}
+
+/* ============================================================
+   UTILITY CLASSES
+   ============================================================ */
+@layer utilities {
+  /* Gradient text — violet → cyan */
+  .gradient-text {
+    background: linear-gradient(135deg, var(--violet) 0%, var(--cyan) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
-  ::-webkit-scrollbar-thumb {
-    background: hsl(var(--border));
-    border-radius: 3px;
+
+  /* Gradient text — violet → pink */
+  .gradient-text-warm {
+    background: linear-gradient(135deg, var(--violet) 0%, var(--pink) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
-  ::-webkit-scrollbar-thumb:hover {
-    background: hsl(var(--muted-foreground));
+
+  /* Glass morphism surface */
+  .glass {
+    background: rgba(17, 8, 32, 0.55);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--violet-border);
   }
+
+  [data-theme="underground"] .glass {
+    background: rgba(8, 8, 16, 0.7);
+    border-color: rgba(124, 58, 237, 0.15);
+  }
+
+  /* Glow effects */
+  .glow-violet { box-shadow: var(--glow-violet); }
+  .glow-cyan   { box-shadow: var(--glow-cyan); }
+  .glow-sm     { box-shadow: var(--glow-sm); }
+
+  /* Ambient gradient mesh background */
+  .mesh-bg {
+    background:
+      radial-gradient(ellipse 80% 50% at 20% -10%, rgba(168, 85, 247, 0.18) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 20%, rgba(34, 211, 238, 0.1) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 60% at 50% 100%, rgba(244, 114, 182, 0.08) 0%, transparent 60%);
+  }
+
+  [data-theme="underground"] .mesh-bg {
+    background:
+      radial-gradient(ellipse 80% 50% at 20% -10%, rgba(124, 58, 237, 0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 20%, rgba(8, 145, 178, 0.06) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 60% at 50% 100%, rgba(190, 24, 93, 0.05) 0%, transparent 60%);
+  }
+
+  /* Violet border with glow on hover */
+  .border-glow {
+    border: 1px solid var(--violet-border);
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .border-glow:hover {
+    border-color: var(--violet);
+    box-shadow: var(--glow-sm);
+  }
+
+  /* Score color classes — used in transition badges */
+  .score-perfect { color: #4ADE80; }
+  .score-good    { color: #A855F7; }
+  .score-ok      { color: #FB923C; }
+  .score-rough   { color: #F87171; }
 }

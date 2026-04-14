@@ -1,55 +1,47 @@
 import { TransitionScore } from '@/types'
-import { transitionBgColor, transitionColor } from '@/lib/transitions'
-import { cn } from '@/lib/utils'
 
 interface TransitionBadgeProps {
   transition: TransitionScore
   compact?: boolean
 }
 
+function scoreStyle(score: number) {
+  if (score >= 80) return { color: '#4ADE80', bg: 'rgba(74,222,128,0.1)', border: 'rgba(74,222,128,0.25)' }
+  if (score >= 60) return { color: '#A855F7', bg: 'rgba(168,85,247,0.1)', border: 'rgba(168,85,247,0.25)' }
+  if (score >= 40) return { color: '#FB923C', bg: 'rgba(251,146,60,0.1)', border: 'rgba(251,146,60,0.25)' }
+  return { color: '#F87171', bg: 'rgba(248,113,113,0.1)', border: 'rgba(248,113,113,0.25)' }
+}
+
 export function TransitionBadge({ transition, compact = false }: TransitionBadgeProps) {
-  const colorClass = transitionColor(transition.score)
-  const bgClass = transitionBgColor(transition.score)
+  const s = scoreStyle(transition.score)
 
   if (compact) {
     return (
       <div
-        className={cn(
-          'inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-xs font-mono font-semibold',
-          bgClass,
-          colorClass
-        )}
-        title={`Transition: ${transition.camelotFrom} → ${transition.camelotTo} | BPM diff: ${transition.bpmDiff.toFixed(1)}`}
+        className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold"
+        style={{ color: s.color, background: s.bg, border: `1px solid ${s.border}` }}
+        title={`${transition.camelotFrom} → ${transition.camelotTo} · Δ${transition.bpmDiff.toFixed(1)} BPM`}
       >
         {transition.score}
+        <span className="opacity-50 font-normal text-[9px] uppercase tracking-wider">{transition.label}</span>
       </div>
     )
   }
 
   return (
-    <div className={cn('flex items-center justify-between px-3 py-1.5 rounded-md border text-xs', bgClass)}>
-      <div className="flex items-center gap-3">
-        {/* Score */}
-        <span className={cn('font-bold text-base font-mono', colorClass)}>
+    <div
+      className="flex items-center justify-between px-4 py-2 rounded-lg text-xs"
+      style={{ color: s.color, background: s.bg, border: `1px solid ${s.border}` }}
+    >
+      <div className="flex items-center gap-4">
+        <span className="font-black text-base font-mono">
           {transition.score}
-          <span className="text-xs font-normal opacity-60">/100</span>
+          <span className="text-[10px] font-normal opacity-50">/100</span>
         </span>
-
-        {/* Camelot */}
-        <span className="text-muted-foreground">
-          {transition.camelotFrom} → {transition.camelotTo}
-        </span>
-
-        {/* BPM diff */}
-        <span className="text-muted-foreground">
-          Δ{transition.bpmDiff.toFixed(1)} BPM
-        </span>
+        <span className="opacity-60">{transition.camelotFrom} → {transition.camelotTo}</span>
+        <span className="opacity-60">Δ{transition.bpmDiff.toFixed(1)} BPM</span>
       </div>
-
-      {/* Label */}
-      <span className={cn('uppercase text-[10px] tracking-wider font-semibold', colorClass)}>
-        {transition.label}
-      </span>
+      <span className="uppercase text-[10px] tracking-widest font-bold opacity-80">{transition.label}</span>
     </div>
   )
 }

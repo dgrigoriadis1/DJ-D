@@ -134,7 +134,8 @@ export function TrackSearch({ setlistId, onTrackAdded }: TrackSearchProps) {
                 <Button
                   size="sm"
                   variant="ghost"
-                  className="shrink-0 text-spotify-green hover:text-spotify-green hover:bg-spotify-green/10"
+                  className="shrink-0"
+                  style={{ color: 'var(--violet)' }}
                   onClick={() => addTrack(track)}
                   disabled={addingId === track.id}
                 >

@@ -2,11 +2,9 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Loader2 } from 'lucide-react'
+import { ArrowLeft, Loader2, Plus } from 'lucide-react'
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { toast } from 'sonner'
 
 export default function NewSetlistPage() {
@@ -42,76 +40,96 @@ export default function NewSetlistPage() {
   }
 
   return (
-    <div className="max-w-lg mx-auto px-4 py-8">
-      <div className="mb-6">
-        <Button variant="ghost" size="sm" asChild className="mb-4">
-          <Link href="/setlists">
-            <ArrowLeft className="h-4 w-4 mr-1" />
-            Back to sets
-          </Link>
-        </Button>
-        <h1 className="text-2xl font-bold">New Set</h1>
-        <p className="text-muted-foreground mt-1">Give your setlist a name to get started</p>
+    <div className="max-w-lg mx-auto px-4 py-10 animate-fade-in">
+      <Link
+        href="/setlists"
+        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back to sets
+      </Link>
+
+      <div className="mb-7">
+        <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground mb-1">New</p>
+        <h1 className="text-3xl font-black">Create a <span className="gradient-text">Set</span></h1>
+        <p className="text-muted-foreground text-sm mt-1">Give your setlist a name to get started</p>
       </div>
 
-      <Card className="bg-card/50">
-        <CardHeader>
-          <CardTitle className="text-lg">Set details</CardTitle>
-          <CardDescription>You can always change these later</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleCreate} className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium" htmlFor="name">
-                Set name <span className="text-destructive">*</span>
-              </label>
-              <Input
-                id="name"
-                placeholder="e.g., Saturday Night Peak Hour"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                maxLength={100}
-                autoFocus
-              />
-            </div>
+      <div
+        className="rounded-2xl p-6"
+        style={{
+          background: 'rgba(255,255,255,0.025)',
+          border: '1px solid var(--violet-border)',
+        }}
+      >
+        <form onSubmit={handleCreate} className="space-y-5">
+          <div className="space-y-2">
+            <label className="text-sm font-semibold" htmlFor="name">
+              Set name <span style={{ color: 'var(--pink)' }}>*</span>
+            </label>
+            <Input
+              id="name"
+              placeholder="e.g., Saturday Night Peak Hour"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              maxLength={100}
+              autoFocus
+              className="bg-white/5 border-white/10 focus:border-violet-500/60"
+            />
+          </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium" htmlFor="description">
-                Description{' '}
-                <span className="text-muted-foreground font-normal">(optional)</span>
-              </label>
-              <Input
-                id="description"
-                placeholder="e.g., Tech house, 126-132 BPM, 2-hour set"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                maxLength={200}
-              />
-            </div>
+          <div className="space-y-2">
+            <label className="text-sm font-semibold" htmlFor="description">
+              Description{' '}
+              <span className="text-muted-foreground font-normal">(optional)</span>
+            </label>
+            <Input
+              id="description"
+              placeholder="e.g., Tech house, 126-132 BPM, 2-hour set"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              maxLength={200}
+              className="bg-white/5 border-white/10 focus:border-violet-500/60"
+            />
+          </div>
 
-            <div className="flex gap-3 pt-2">
-              <Button
-                type="submit"
-                variant="spotify"
-                disabled={!name.trim() || loading}
-                className="flex-1"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Creating...
-                  </>
-                ) : (
-                  'Create Set'
-                )}
-              </Button>
-              <Button type="button" variant="outline" asChild>
-                <Link href="/setlists">Cancel</Link>
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+          <div className="flex gap-3 pt-1">
+            <button
+              type="submit"
+              disabled={!name.trim() || loading}
+              className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{
+                background: 'linear-gradient(135deg, var(--violet), var(--cyan))',
+                color: '#fff',
+                boxShadow: loading ? 'none' : 'var(--glow-sm)',
+              }}
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                <>
+                  <Plus className="h-4 w-4" />
+                  Create Set
+                </>
+              )}
+            </button>
+            <Link
+              href="/setlists"
+              className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200"
+              style={{
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                color: 'var(--muted-foreground)',
+              }}
+            >
+              Cancel
+            </Link>
+          </div>
+        </form>
+      </div>
     </div>
   )
 }

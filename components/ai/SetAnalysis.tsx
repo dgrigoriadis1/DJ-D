@@ -2,8 +2,6 @@
 
 import { useState } from 'react'
 import { Sparkles, AlertTriangle, Lightbulb, Music, Loader2, RefreshCw } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { AIAnalysis, SetlistTrackData } from '@/types'
 import { toast } from 'sonner'
 
@@ -13,15 +11,12 @@ interface SetAnalysisProps {
   setlistName: string
 }
 
-export function SetAnalysis({ setlistId, tracks, setlistName }: SetAnalysisProps) {
+export function SetAnalysis({ setlistId, tracks }: SetAnalysisProps) {
   const [analysis, setAnalysis] = useState<AIAnalysis | null>(null)
   const [loading, setLoading] = useState(false)
 
   const analyze = async () => {
-    if (tracks.length < 2) {
-      toast.error('Add at least 2 tracks to analyze your set')
-      return
-    }
+    if (tracks.length < 2) { toast.error('Add at least 2 tracks'); return }
     setLoading(true)
     try {
       const res = await fetch('/api/ai/analyze', {
@@ -29,15 +24,11 @@ export function SetAnalysis({ setlistId, tracks, setlistName }: SetAnalysisProps
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ setlistId }),
       })
-      if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.error || 'Analysis failed')
-      }
-      const data = await res.json()
-      setAnalysis(data)
-      toast.success('Analysis complete!')
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Analysis failed')
+      if (!res.ok) { const e = await res.json(); throw new Error(e.error) }
+      setAnalysis(await res.json())
+      toast.success('Analysis complete')
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Analysis failed')
     } finally {
       setLoading(false)
     }
@@ -45,157 +36,202 @@ export function SetAnalysis({ setlistId, tracks, setlistName }: SetAnalysisProps
 
   if (tracks.length < 2) {
     return (
-      <div className="text-center py-12 text-muted-foreground">
-        <Sparkles className="h-10 w-10 mx-auto mb-3 opacity-30" />
-        <p className="font-medium">Add at least 2 tracks to get AI analysis</p>
+      <div className="text-center py-14 text-muted-foreground">
+        <Sparkles className="h-9 w-9 mx-auto mb-3 opacity-20" />
+        <p className="text-sm">Add at least 2 tracks to get AI analysis</p>
       </div>
     )
   }
 
   if (!analysis) {
     return (
-      <div className="text-center py-12">
-        <Sparkles className="h-12 w-12 mx-auto mb-4 text-spotify-green opacity-60" />
-        <h3 className="font-semibold text-lg mb-2">AI Set Analysis</h3>
-        <p className="text-muted-foreground text-sm mb-6 max-w-sm mx-auto">
-          Claude will analyze your {tracks.length}-track set for energy arc, harmonic flow, and
-          weak transitions, then recommend songs to improve it.
+      <div className="text-center py-14">
+        <div
+          className="inline-flex p-4 rounded-2xl mb-5"
+          style={{ background: 'rgba(168,85,247,0.1)', border: '1px solid rgba(168,85,247,0.2)' }}
+        >
+          <Sparkles className="h-8 w-8" style={{ color: 'var(--violet)' }} />
+        </div>
+        <h3 className="font-bold text-lg mb-2">AI Set Analysis</h3>
+        <p className="text-muted-foreground text-sm mb-7 max-w-sm mx-auto leading-relaxed">
+          Claude will analyze your {tracks.length}-track set — energy arc, harmonic flow,
+          weak transitions — and suggest songs to fill the gaps.
         </p>
-        <Button variant="spotify" onClick={analyze} disabled={loading}>
-          {loading ? (
-            <>
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              Analyzing...
-            </>
-          ) : (
-            <>
-              <Sparkles className="h-4 w-4 mr-2" />
-              Analyze My Set
-            </>
-          )}
-        </Button>
+        <button
+          onClick={analyze}
+          disabled={loading}
+          className="inline-flex items-center gap-2 px-7 py-3 rounded-xl font-bold text-sm transition-all duration-200 disabled:opacity-50"
+          style={{
+            background: 'linear-gradient(135deg, var(--violet), var(--cyan))',
+            color: '#fff',
+            boxShadow: loading ? 'none' : 'var(--glow-violet)',
+          }}
+        >
+          {loading
+            ? <><Loader2 className="h-4 w-4 animate-spin" /> Analyzing...</>
+            : <><Sparkles className="h-4 w-4" /> Analyze My Set</>
+          }
+        </button>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
-      {/* Re-analyze button */}
+    <div className="space-y-5 animate-fade-in">
+      {/* Re-analyze */}
       <div className="flex justify-end">
-        <Button variant="ghost" size="sm" onClick={analyze} disabled={loading}>
-          {loading ? (
-            <Loader2 className="h-4 w-4 animate-spin mr-1" />
-          ) : (
-            <RefreshCw className="h-4 w-4 mr-1" />
-          )}
+        <button
+          onClick={analyze}
+          disabled={loading}
+          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+        >
+          {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
           Re-analyze
-        </Button>
+        </button>
       </div>
 
       {/* Overview */}
-      <div className="p-4 rounded-lg bg-muted/30 border border-border">
-        <div className="flex items-center gap-2 mb-2">
-          <Sparkles className="h-4 w-4 text-spotify-green" />
-          <h3 className="font-semibold text-sm">Overview</h3>
-        </div>
+      <Section
+        icon={<Sparkles className="h-4 w-4" />}
+        iconColor="var(--violet)"
+        title="Overview"
+        accent="var(--violet)"
+      >
         <p className="text-sm text-muted-foreground leading-relaxed">{analysis.overview}</p>
-      </div>
+      </Section>
 
       {/* Energy arc */}
-      <div className="p-4 rounded-lg bg-muted/30 border border-border">
-        <div className="flex items-center gap-2 mb-2">
-          <span className="text-base">⚡</span>
-          <h3 className="font-semibold text-sm">Energy Arc</h3>
-        </div>
+      <Section
+        icon={<span className="text-sm">⚡</span>}
+        iconColor="var(--cyan)"
+        title="Energy Arc"
+        accent="var(--cyan)"
+      >
         <p className="text-sm text-muted-foreground leading-relaxed">{analysis.energyArcAnalysis}</p>
-      </div>
+      </Section>
 
       {/* Weak transitions */}
       {analysis.weakTransitions.length > 0 && (
-        <div>
-          <div className="flex items-center gap-2 mb-3">
-            <AlertTriangle className="h-4 w-4 text-orange-400" />
-            <h3 className="font-semibold text-sm">Weak Transitions</h3>
-            <Badge variant="secondary">{analysis.weakTransitions.length}</Badge>
-          </div>
+        <Section
+          icon={<AlertTriangle className="h-4 w-4" />}
+          iconColor="#FB923C"
+          title={`Weak Transitions (${analysis.weakTransitions.length})`}
+          accent="#FB923C"
+        >
           <div className="space-y-3">
             {analysis.weakTransitions.map((wt, i) => (
               <div
                 key={i}
-                className="p-3 rounded-lg border border-orange-500/20 bg-orange-500/5"
+                className="rounded-xl p-4 text-sm"
+                style={{ background: 'rgba(251,146,60,0.06)', border: '1px solid rgba(251,146,60,0.18)' }}
               >
-                <p className="text-xs font-semibold text-orange-400 mb-1">
+                <p className="text-xs font-mono font-bold mb-1.5" style={{ color: '#FB923C' }}>
                   After track {wt.position + 1}
                 </p>
-                <p className="text-sm text-muted-foreground mb-1">{wt.reason}</p>
-                <p className="text-sm text-foreground">
-                  <span className="text-orange-400 font-medium">Suggestion: </span>
+                <p className="text-muted-foreground mb-1.5">{wt.reason}</p>
+                <p>
+                  <span style={{ color: '#FB923C' }} className="font-semibold">Fix: </span>
                   {wt.suggestion}
                 </p>
               </div>
             ))}
           </div>
-        </div>
+        </Section>
       )}
 
       {/* Recommendations */}
       {analysis.recommendations.length > 0 && (
-        <div>
-          <div className="flex items-center gap-2 mb-3">
-            <Music className="h-4 w-4 text-spotify-green" />
-            <h3 className="font-semibold text-sm">Recommended Additions</h3>
-          </div>
+        <Section
+          icon={<Music className="h-4 w-4" />}
+          iconColor="var(--violet)"
+          title="Recommended Additions"
+          accent="var(--violet)"
+        >
           <div className="space-y-3">
             {analysis.recommendations.map((rec, i) => (
               <div
                 key={i}
-                className="p-3 rounded-lg border border-spotify-green/20 bg-spotify-green/5"
+                className="rounded-xl p-4 text-sm"
+                style={{ background: 'rgba(168,85,247,0.06)', border: '1px solid rgba(168,85,247,0.18)' }}
               >
-                <div className="flex items-start justify-between gap-3">
+                <div className="flex items-start justify-between gap-3 mb-2">
                   <div>
-                    <p className="font-semibold text-sm">{rec.name}</p>
+                    <p className="font-bold">{rec.name}</p>
                     <p className="text-xs text-muted-foreground">{rec.artist}</p>
                   </div>
                   <div className="flex gap-1.5 shrink-0">
                     {rec.expectedBPM && (
-                      <Badge variant="outline" className="font-mono text-xs">
+                      <span
+                        className="text-[10px] font-mono px-2 py-0.5 rounded-full"
+                        style={{ background: 'rgba(34,211,238,0.1)', color: 'var(--cyan)', border: '1px solid rgba(34,211,238,0.2)' }}
+                      >
                         ~{rec.expectedBPM} BPM
-                      </Badge>
+                      </span>
                     )}
                     {rec.expectedKey && (
-                      <Badge variant="outline" className="font-mono text-xs">
+                      <span
+                        className="text-[10px] font-mono px-2 py-0.5 rounded-full"
+                        style={{ background: 'rgba(168,85,247,0.1)', color: 'var(--violet)', border: '1px solid rgba(168,85,247,0.2)' }}
+                      >
                         {rec.expectedKey}
-                      </Badge>
+                      </span>
                     )}
                   </div>
                 </div>
-                <p className="text-sm text-muted-foreground mt-2">{rec.reason}</p>
-                <p className="text-xs text-spotify-green mt-1">
-                  Insert at position {rec.suggestedPosition + 1}
+                <p className="text-muted-foreground text-sm">{rec.reason}</p>
+                <p className="text-xs mt-1.5" style={{ color: 'var(--violet)' }}>
+                  → Insert at position {rec.suggestedPosition + 1}
                 </p>
               </div>
             ))}
           </div>
-        </div>
+        </Section>
       )}
 
-      {/* General tips */}
+      {/* Tips */}
       {analysis.generalTips.length > 0 && (
-        <div>
-          <div className="flex items-center gap-2 mb-3">
-            <Lightbulb className="h-4 w-4 text-yellow-400" />
-            <h3 className="font-semibold text-sm">DJ Tips</h3>
-          </div>
+        <Section
+          icon={<Lightbulb className="h-4 w-4" />}
+          iconColor="#FBBF24"
+          title="DJ Tips"
+          accent="#FBBF24"
+        >
           <ul className="space-y-2">
             {analysis.generalTips.map((tip, i) => (
-              <li key={i} className="flex gap-2 text-sm text-muted-foreground">
-                <span className="text-yellow-400 shrink-0">·</span>
+              <li key={i} className="flex gap-2.5 text-sm text-muted-foreground">
+                <span style={{ color: '#FBBF24' }} className="shrink-0 mt-0.5">›</span>
                 {tip}
               </li>
             ))}
           </ul>
-        </div>
+        </Section>
       )}
+    </div>
+  )
+}
+
+function Section({
+  icon, iconColor, title, accent, children,
+}: {
+  icon: React.ReactNode
+  iconColor: string
+  title: string
+  accent: string
+  children: React.ReactNode
+}) {
+  return (
+    <div
+      className="rounded-xl p-5"
+      style={{
+        background: 'rgba(255,255,255,0.02)',
+        border: `1px solid ${accent}22`,
+      }}
+    >
+      <div className="flex items-center gap-2 mb-3">
+        <span style={{ color: iconColor }}>{icon}</span>
+        <h3 className="font-bold text-sm">{title}</h3>
+      </div>
+      {children}
     </div>
   )
 }

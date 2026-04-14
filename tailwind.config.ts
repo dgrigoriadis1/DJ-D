@@ -6,16 +6,14 @@ const config: Config = {
     './pages/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
     './app/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
+    './hooks/**/*.{ts,tsx}',
   ],
   prefix: '',
   theme: {
     container: {
       center: true,
       padding: '2rem',
-      screens: {
-        '2xl': '1400px',
-      },
+      screens: { '2xl': '1400px' },
     },
     extend: {
       colors: {
@@ -52,9 +50,21 @@ const config: Config = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
-        spotify: {
-          green: '#1DB954',
-          black: '#191414',
+        // Brand palette
+        violet: {
+          DEFAULT: '#A855F7',
+          dim: 'rgba(168,85,247,0.15)',
+          dark: '#7C3AED',
+        },
+        cyan: {
+          DEFAULT: '#22D3EE',
+          dim: 'rgba(34,211,238,0.12)',
+          dark: '#0891B2',
+        },
+        pink: {
+          DEFAULT: '#F472B6',
+          dim: 'rgba(244,114,182,0.12)',
+          dark: '#BE185D',
         },
       },
       borderRadius: {
@@ -63,18 +73,18 @@ const config: Config = {
         sm: 'calc(var(--radius) - 4px)',
       },
       keyframes: {
-        'accordion-down': {
-          from: { height: '0' },
-          to: { height: 'var(--radix-accordion-content-height)' },
+        'pulse-glow': {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.6' },
         },
-        'accordion-up': {
-          from: { height: 'var(--radix-accordion-content-height)' },
-          to: { height: '0' },
+        'fade-in': {
+          from: { opacity: '0', transform: 'translateY(8px)' },
+          to: { opacity: '1', transform: 'translateY(0)' },
         },
       },
       animation: {
-        'accordion-down': 'accordion-down 0.2s ease-out',
-        'accordion-up': 'accordion-up 0.2s ease-out',
+        'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
+        'fade-in': 'fade-in 0.4s ease-out',
       },
     },
   },

@@ -74,18 +74,18 @@ export function setlistQualityScore(transitions: TransitionScore[]): number {
 }
 
 /**
- * Color class for a transition score.
+ * Inline color values for a transition score.
  */
 export function transitionColor(score: number): string {
-  if (score >= 80) return 'text-green-400'
-  if (score >= 60) return 'text-yellow-400'
-  if (score >= 40) return 'text-orange-400'
-  return 'text-red-400'
+  if (score >= 80) return '#4ADE80'
+  if (score >= 60) return '#A855F7'
+  if (score >= 40) return '#FB923C'
+  return '#F87171'
 }
 
 export function transitionBgColor(score: number): string {
   if (score >= 80) return 'bg-green-500/20 border-green-500/40'
-  if (score >= 60) return 'bg-yellow-500/20 border-yellow-500/40'
+  if (score >= 60) return 'bg-violet-500/20 border-violet-500/40'
   if (score >= 40) return 'bg-orange-500/20 border-orange-500/40'
   return 'bg-red-500/20 border-red-500/40'
 }

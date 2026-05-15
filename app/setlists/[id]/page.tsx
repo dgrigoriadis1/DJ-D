@@ -4,10 +4,9 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import { SetlistEditor } from '@/components/setlist/SetlistEditor'
+import { SetlistHeader } from '@/components/setlist/SetlistHeader'
 import { SetlistTrackData } from '@/types'
-import { formatDuration } from '@/lib/utils'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -27,6 +26,10 @@ export default async function SetlistPage({ params }: Props) {
   if (!setlist) notFound()
 
   const totalDuration = setlist.tracks.reduce((acc, t) => acc + t.duration, 0)
+  const avgBPM =
+    setlist.tracks.length > 0
+      ? setlist.tracks.reduce((acc, t) => acc + t.bpm, 0) / setlist.tracks.length
+      : 0
 
   const tracks: SetlistTrackData[] = setlist.tracks.map((t) => ({
     id: t.id,
@@ -48,44 +51,26 @@ export default async function SetlistPage({ params }: Props) {
   }))
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Header */}
-      <div className="mb-6">
-        <Button variant="ghost" size="sm" asChild className="mb-4">
-          <Link href="/setlists">
-            <ArrowLeft className="h-4 w-4 mr-1" />
-            My sets
-          </Link>
-        </Button>
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
+      {/* Back link */}
+      <Link
+        href="/setlists"
+        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        My sets
+      </Link>
 
-        <div className="flex items-start justify-between">
-          <div>
-            <h1 className="text-2xl font-bold">{setlist.name}</h1>
-            {setlist.description && (
-              <p className="text-muted-foreground mt-1">{setlist.description}</p>
-            )}
-            <div className="flex items-center gap-3 text-xs text-muted-foreground mt-2">
-              {setlist.tracks.length > 0 && (
-                <>
-                  <span>{setlist.tracks.length} tracks</span>
-                  {totalDuration > 0 && (
-                    <>
-                      <span>·</span>
-                      <span>{formatDuration(totalDuration)}</span>
-                    </>
-                  )}
-                  <span>·</span>
-                  <span className="font-mono">
-                    {(
-                      setlist.tracks.reduce((acc, t) => acc + t.bpm, 0) / setlist.tracks.length
-                    ).toFixed(0)}{' '}
-                    avg BPM
-                  </span>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
+      {/* Header with rename + delete */}
+      <div className="mb-6">
+        <SetlistHeader
+          setlistId={setlist.id}
+          name={setlist.name}
+          description={setlist.description}
+          trackCount={setlist.tracks.length}
+          totalDuration={totalDuration}
+          avgBPM={avgBPM}
+        />
       </div>
 
       {/* Editor */}

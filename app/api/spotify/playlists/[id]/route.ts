@@ -20,12 +20,18 @@ export async function GET(
   const tracks = await spotify.getPlaylistTracks(id)
 
   // Batch-fetch audio features (Spotify allows up to 100 per request)
+  // Audio features API is restricted for some Spotify apps — fail gracefully
   const enriched = []
   for (let i = 0; i < tracks.length; i += 100) {
     const batch = tracks.slice(i, i + 100)
-    const ids = batch.map((t) => t.id)
-    const features = await spotify.getAudioFeatures(ids)
-    const featuresMap = new Map(features.map((f) => [f.id, f]))
+    let featuresMap = new Map()
+    try {
+      const ids = batch.map((t) => t.id)
+      const features = await spotify.getAudioFeatures(ids)
+      featuresMap = new Map(features.map((f) => [f.id, f]))
+    } catch {
+      // continue without audio features
+    }
 
     for (const track of batch) {
       enriched.push({

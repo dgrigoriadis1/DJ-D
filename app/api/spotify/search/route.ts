@@ -20,10 +20,15 @@ export async function GET(request: Request) {
   const spotify = createSpotifyClient(session.accessToken)
   const tracks = await spotify.searchTracks(query, 20)
 
-  // Fetch audio features for all results in one batch
-  const trackIds = tracks.map((t) => t.id)
-  const features = await spotify.getAudioFeatures(trackIds)
-  const featuresMap = new Map(features.map((f) => [f.id, f]))
+  // Audio features API is restricted for some Spotify apps — fail gracefully
+  let featuresMap = new Map()
+  try {
+    const trackIds = tracks.map((t) => t.id)
+    const features = await spotify.getAudioFeatures(trackIds)
+    featuresMap = new Map(features.map((f) => [f.id, f]))
+  } catch {
+    // continue without audio features
+  }
 
   const enriched = tracks.map((track) => ({
     ...track,

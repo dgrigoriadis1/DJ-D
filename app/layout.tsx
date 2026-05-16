@@ -22,6 +22,12 @@ export default function RootLayout({
           <main className="min-h-[calc(100vh-4rem)]">
             {children}
           </main>
+          <footer className="text-center py-3 text-xs text-zinc-600">
+            BPM &amp; key data powered by{' '}
+            <a href="https://getsongbpm.com" target="_blank" rel="noopener noreferrer" className="underline hover:text-zinc-400">
+              GetSongBPM.com
+            </a>
+          </footer>
         </Providers>
       </body>
     </html>
